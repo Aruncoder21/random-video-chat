@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Random Video Chat</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #020617;
+      color: #e5e7eb;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    h1 {
+      margin-bottom: 6px;
+    }
+
+    #status {
+      font-size: 14px;
+      margin-bottom: 12px;
+      color: #9ca3af;
+    }
+
+    #video-container {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 16px;
+    }
+
+    video {
+      width: 320px;
+      max-width: 45vw;
+      background: #000;
+      border-radius: 10px;
+    }
+
+    #controls {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    button {
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: none;
+      cursor: pointer;
+      font-weight: 600;
+    }
+
+    #start-btn {
+      background: #22c55e;
+      color: #022c22;
+    }
+
+    #next-btn {
+      background: #a855f7;
+      color: #18022c;
+    }
+
+    #mute-btn, #cam-btn {
+      background: #38bdf8;
+      color: #02131f;
+    }
+
+    #end-btn {
+      background: #ef4444;
+      color: #140404;
+    }
+
+    /* Chat area */
+
+    #chat-area {
+      width: 100%;
+      max-width: 700px;
+      border: 1px solid #1f2937;
+      border-radius: 10px;
+      background: #020617;
+      display: flex;
+      flex-direction: column;
+      height: 220px;
+      overflow: hidden;
+    }
+
+    #chat-messages {
+      flex: 1;
+      padding: 8px;
+      overflow-y: auto;
+      font-size: 14px;
+    }
+
+    .chat-msg {
+      margin: 4px 0;
+      padding: 4px 8px;
+      border-radius: 6px;
+      max-width: 80%;
+      word-wrap: break-word;
+    }
+
+    .me-msg {
+      background: #2563eb;
+      margin-left: auto;
+      text-align: right;
+    }
+
+    .stranger-msg {
+      background: #374151;
+      margin-right: auto;
+      text-align: left;
+    }
+
+    .system-msg {
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+
+    #chat-input-row {
+      display: flex;
+      border-top: 1px solid #1f2937;
+    }
+
+    #chat-input {
+      flex: 1;
+      border: none;
+      padding: 8px;
+      background: #020617;
+      color: #e5e7eb;
+      outline: none;
+      font-size: 14px;
+    }
+
+    #chat-send-btn {
+      border: none;
+      padding: 0 14px;
+      background: #22c55e;
+      color: #022c22;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    #chat-send-btn:disabled,
+    #chat-input:disabled {
+      opacity: 0.5;
+      cursor: default;
+    }
+  </style>
+</head>
+<body>
+  <h1>Random Video Chat</h1>
+  <div id="status">Click "Start" to find a stranger</div>
+
+  <div id="video-container">
+    <div>
+      <div>YOU</div>
+      <video id="localVideo" autoplay playsinline muted></video>
+    </div>
+    <div>
+      <div>STRANGER</div>
+      <video id="remoteVideo" autoplay playsinline></video>
+    </div>
+  </div>
+
+  <div id="controls">
+    <button id="start-btn">Start</button>
+    <button id="next-btn" disabled>Next</button>
+    <button id="mute-btn" disabled>Mute</button>
+    <button id="cam-btn" disabled>Camera Off</button>
+    <button id="end-btn" disabled>End</button>
+  </div>
+
+  <!-- Text chat area -->
+  <div id="chat-area">
+    <div id="chat-messages"></div>
+    <div id="chat-input-row">
+      <input id="chat-input" type="text" placeholder="Type a message..." disabled />
+      <button id="chat-send-btn" disabled>Send</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const statusEl = document.getElementById("status");
+    const startBtn = document.getElementById("start-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const muteBtn = document.getElementById("mute-btn");
+    const camBtn = document.getElementById("cam-btn");
+    const endBtn = document.getElementById("end-btn");
+
+    const localVideo = document.getElementById("localVideo");
+    const remoteVideo = document.getElementById("remoteVideo");
+
+    // chat elements
+    const chatMessages = document.getElementById("chat-messages");
+    const chatInput = document.getElementById("chat-input");
+    const chatSendBtn = document.getElementById("chat-send-btn");
+
+    let pc = null;
+    let localStream = null;
+    let isInitiator = false;
+    let audioEnabled = true;
+    let videoEnabled = true;
+    let myId = null;
+
+    const rtcConfig = {
+      iceServers: [
+        { urls: "stun:stun.l.google.com:19302" }
+      ]
+    };
+
+    socket.on("connect", () => {
+      myId = socket.id;
+      console.log("Connected with id:", myId);
+    });
+
+    function setStatus(text) {
+      statusEl.innerText = text;
+      console.log(text);
+    }
+
+    function addSystemMessage(text) {
+      const div = document.createElement("div");
+      div.classList.add("system-msg");
+      div.innerText = text;
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    function addChatMessage(fromId, text) {
+      const div = document.createElement("div");
+      div.classList.add("chat-msg");
+
+      if (fromId === myId) {
+        div.classList.add("me-msg");
+        div.innerText = "You: " + text;
+      } else {
+        div.classList.add("stranger-msg");
+        div.innerText = "Stranger: " + text;
+      }
+
+      chatMessages.appendChild(div);
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+
+    async function setupMedia() {
+      if (localStream) return;
+
+      try {
+        localStream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: true,
+        });
+        localVideo.srcObject = localStream;
+      } catch (err) {
+        console.error("Camera/mic error:", err);
+        alert("Camera/mic access denied. Please allow permissions.");
+      }
+    }
+
+    function createPeerConnection() {
+      pc = new RTCPeerConnection(rtcConfig);
+
+      pc.onicecandidate = (event) => {
+        if (event.candidate) {
+          socket.emit("signal", {
+            type: "candidate",
+            candidate: event.candidate,
+          });
+        }
+      };
+
+      pc.ontrack = (event) => {
+        console.log("Got remote track");
+        remoteVideo.srcObject = event.streams[0];
+      };
+
+      localStream.getTracks().forEach((track) => {
+        pc.addTrack(track, localStream);
+      });
+    }
+
+    // partner mil gaya
+    socket.on("partner-found", async (data) => {
+      setStatus("Partner found. Connecting...");
+      isInitiator = data.initiator;
+
+      await setupMedia();
+      createPeerConnection();
+
+      if (isInitiator) {
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        socket.emit("signal", {
+          type: "offer",
+          sdp: offer.sdp,
+        });
+      }
+
+      startBtn.disabled = true;
+      nextBtn.disabled = false;
+      muteBtn.disabled = false;
+      camBtn.disabled = false;
+      endBtn.disabled = false;
+
+      chatInput.disabled = false;
+      chatSendBtn.disabled = false;
+      addSystemMessage("You are now connected to a stranger.");
+    });
+
+    socket.on("waiting", () => {
+      setStatus("Waiting for a partner...");
+      addSystemMessage("Waiting for a partner...");
+    });
+
+    socket.on("partner-disconnected", () => {
+      setStatus("Partner disconnected.");
+      addSystemMessage("Stranger disconnected.");
+      cleanupCall();
+    });
+
+    socket.on("signal", async (data) => {
+      if (!pc) {
+        await setupMedia();
+        createPeerConnection();
+      }
+
+      if (data.type === "offer") {
+        await pc.setRemoteDescription(
+          new RTCSessionDescription({ type: "offer", sdp: data.sdp })
+        );
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit("signal", {
+          type: "answer",
+          sdp: answer.sdp,
+        });
+      } else if (data.type === "answer") {
+        await pc.setRemoteDescription(
+          new RTCSessionDescription({ type: "answer", sdp: data.sdp })
+        );
+      } else if (data.type === "candidate") {
+        try {
+          await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
+        } catch (err) {
+          console.error("Error adding ICE candidate", err);
+        }
+      }
+    });
+
+    // TEXT CHAT receive
+    socket.on("chat-message", (data) => {
+      addChatMessage(data.from, data.text);
+    });
+
+    // -------------- BUTTON HANDLERS -----------------
+
+    startBtn.onclick = async () => {
+      await setupMedia();
+      socket.emit("find-partner");
+      setStatus("Searching for a partner...");
+      startBtn.disabled = true;
+      nextBtn.disabled = true;
+      muteBtn.disabled = true;
+      camBtn.disabled = true;
+      endBtn.disabled = true;
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+      chatMessages.innerHTML = "";
+    };
+
+    nextBtn.onclick = () => {
+      cleanupCall();
+      socket.emit("next");
+      setStatus("Searching for a new partner...");
+      startBtn.disabled = true;
+      nextBtn.disabled = true;
+      muteBtn.disabled = true;
+      camBtn.disabled = true;
+      endBtn.disabled = true;
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+      chatMessages.innerHTML = "";
+      addSystemMessage("Searching for a new partner...");
+    };
+
+    muteBtn.onclick = () => {
+      if (!localStream) return;
+      audioEnabled = !audioEnabled;
+      localStream.getAudioTracks().forEach(t => (t.enabled = audioEnabled));
+      muteBtn.innerText = audioEnabled ? "Mute" : "Unmute";
+    };
+
+    camBtn.onclick = () => {
+      if (!localStream) return;
+      videoEnabled = !videoEnabled;
+      localStream.getVideoTracks().forEach(t => (t.enabled = videoEnabled));
+      camBtn.innerText = videoEnabled ? "Camera Off" : "Camera On";
+    };
+
+    endBtn.onclick = () => {
+      cleanupCall();
+      setStatus("Call ended. Click Start or Next to find new partner.");
+      addSystemMessage("Call ended.");
+    };
+
+    // send chat message
+    function sendChat() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      socket.emit("chat-message", text);
+      chatInput.value = "";
+    }
+
+    chatSendBtn.onclick = sendChat;
+
+    chatInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        sendChat();
+      }
+    });
+
+    function cleanupCall() {
+      if (pc) {
+        pc.onicecandidate = null;
+        pc.ontrack = null;
+        pc.close();
+        pc = null;
+      }
+
+      if (remoteVideo.srcObject) {
+        remoteVideo.srcObject.getTracks().forEach(t => t.stop());
+        remoteVideo.srcObject = null;
+      }
+
+      nextBtn.disabled = true;
+      muteBtn.disabled = true;
+      camBtn.disabled = true;
+      endBtn.disabled = true;
+
+      chatInput.disabled = true;
+      chatSendBtn.disabled = true;
+    }
+  </script>
+</body>
+</html>
