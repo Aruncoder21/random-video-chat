@@ -467,248 +467,70 @@ button:disabled::before {
 }
 
 
-    /* next */
+/* ===== Unified video + controls responsive fixes =====
+   Paste this ONCE inside <style> before </style> (replace any older video rules) */
 
-    @media (max-width: 640px) {
-      .app-shell {
-        padding: 14px 10px 10px;
-        border-radius: 16px;
-      }
+/* safe-area & base */
+:root { --safe-top: env(safe-area-inset-top, 10px); }
+html,body{width:100%;height:100%;margin:0;padding:0;-webkit-text-size-adjust:100%;}
+.app-shell{max-width:100% !important;padding-top:calc(var(--safe-top) + 10px) !important;}
 
-      video {
-        border-radius: 10px;
-      }
+/* layout containers */
+.main-layout{display:grid;grid-template-columns:1fr 36%;gap:18px;}
+.video-row,.video-wrapper{display:flex;gap:18px;align-items:stretch;justify-content:space-between;}
+.video-card{flex:1 1 0;display:flex;flex-direction:column;gap:12px;min-width:0;}
 
-      #controls {
-        justify-content: flex-start;
-        overflow-x: auto;
-      }
-
-      button {
-        font-size: 12px;
-        padding-inline: 12px;
-      }
-      /* ===== Mobile / small screens responsive tweaks ===== */
-
-/* Base adjustments for small viewports */
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr; /* stack left (video) and right (chat) */
-    gap: 12px;
-  }
-
-  .app-shell {
-    padding: 12px;
-    border-radius: 12px;
-  }
-
-  .video-card {
-    padding: 12px;
-    border-radius: 14px;
-  }
-
-  .chat-card {
-    padding: 10px;
-    border-radius: 14px;
-  }
-
-  /* make videos taller and full width inside stacked layout */
-  .video-row {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .video-wrapper {
-    width: 100%;
-  }
-
-  video {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16/9;
-  }
-
-  /* move controls under videos and center */
-  #controls {
-    justify-content: center;
-    gap: 8px;
-  }
-
-  /* buttons become pill full/half width for easy tapping */
-  #controls button {
-    flex: 1 1 calc(50% - 8px);
-    min-width: 120px;
-    padding: 0.7em 0.8em;
-    font-size: 14px;
-  }
-
-  /* for very small screens make each control full width stacked */
-  @media (max-width: 420px) {
-    #controls button { flex: 1 1 100%; min-width: 0; }
-  }
-
-  /* Chat: make messages area shorter but still scrollable */
-  #chat-area { height: 220px; }
-  #chat-messages { padding: 8px; gap: 6px; }
-
-  /* Chat input larger to tap easily */
-  #chat-input {
-    height: 46px;
-    padding: 12px;
-    font-size: 15px;
-  }
-  #chat-send-btn {
-    width: 46px;
-    height: 46px;
-  }
-
-  /* Header tweaks */
-  .brand-text-main { font-size: 16px; }
-  .brand-text-sub { font-size: 11px; }
-
-  /* status pill smaller */
-  .status-pill { font-size: 11px; padding: 5px 8px; }
-
-  /* Reduce shadows a bit for mobile performance */
-  .app-shell, .video-card, .chat-card { box-shadow: 0 8px 20px rgba(0,0,0,0.55); }
-
-  /* Hide some decorative elements on very small screens to save space */
-  @media (max-width: 360px) {
-    .brand-text-sub { display: none; }
-    .status-pill { display: none; }
-    .video-label span { display: none; }
-    .video-label { font-size: 10px; }
-  }
+/* unified video element (16:9 boxes) */
+.video-card video{
+  width:100% !important;
+  height:auto !important;
+  aspect-ratio:16/9;
+  object-fit:cover !important;
+  object-position:center center !important;
+  border-radius:12px;
+  display:block;
+  background:#020617;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02);
 }
 
-/* Extra: improve touch-targets on all devices */
-button, #chat-send-btn, #chat-input {
-  -webkit-tap-highlight-color: rgba(255,255,255,0.05);
-  touch-action: manipulation;
+/* label above video */
+.video-label{font-size:12px;letter-spacing:0.08em;color:#9aa6bb;}
+
+/* controls below videos: always centered and wrapped */
+#controls{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;padding:8px 6px 12px;margin-top:6px;}
+#controls button{min-width:120px;padding:0.6rem 1.2rem;font-size:14px;border-radius:10px;}
+#end-btn{margin-left:6px;}
+
+/* chat column */
+.chat-card{flex:0 0 36%;min-width:300px;}
+
+/* responsive: stack on small screens */
+@media (max-width:900px){
+  .main-layout{grid-template-columns:1fr;}
+  .chat-card{width:100%;min-width:0;}
+  .video-row,.video-wrapper{flex-direction:column;gap:12px;}
+  .video-card video{aspect-ratio:16/9;max-height:52vh;}
+  #controls{gap:10px;padding-bottom:8px;}
+  #controls button{min-width:46%;flex:1 1 46%;}
+  .app-shell,.video-card,.chat-card{padding-left:12px !important;padding-right:12px !important;}
 }
 
-/* Optional: hide remote video border on tiny screens so chat looks clean */
-@media (max-width: 420px) {
-  .video-card { border-radius: 12px; }
-  video { border: 0.5px solid rgba(255,255,255,0.03); }
+/* very small phones */
+@media (max-width:420px){
+  #controls button{min-width:100%;flex:1 1 100%;}
+  .video-card video{max-height:48vh;}
 }
 
-/* Smooth scroll behaviour for chat on mobile */
-#chat-messages {
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-
-    }
-    /* === FORCE mobile-friendly overrides (drop-in) === */
-/* paste this at the end of your <style> in public/index.html */
-
-html, body {
-  width: 100% !important;
-  height: 100% !important;
-  margin: 0 !important;
-  padding: 0 !important;
-  -webkit-text-size-adjust: 100% !important;
-}
-
-.app-shell {
-  width: 100% !important;
-  max-width: 100% !important;     /* force full width */
-  margin: 12px auto !important;
-  padding: 12px !important;
-  border-radius: 12px !important;
-}
-
-/* make sure internal grid becomes single column on small screens */
-@media (max-width: 900px) {
-  .main-layout {
-    grid-template-columns: 1fr !important;
-    gap: 12px !important;
-  }
-
-  .video-card, .chat-card {
-    width: 100% !important;
-    min-width: 0 !important;
-  }
-
-  .video-row {
-    flex-direction: column !important;
-    gap: 12px !important;
-  }
-
-  .video-wrapper {
-    width: 100% !important;
-  }
-
-  video {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16/9;
-  }
-
-  #controls {
-    justify-content: center !important;
-    gap: 10px !important;
-  }
-
-  /* make buttons larger and wrapped for easy tap */
-  #controls button {
-    flex: 1 1 calc(50% - 8px) !important;
-    min-width: 120px !important;
-    box-sizing: border-box !important;
-  }
-
-  /* chat area full width */
-  #chat-area {
-    width: 100% !important;
-  }
-
-  /* reduce big paddings that cause shrink */
-  .brand, .app-header { gap: 8px !important; }
-}
-
-/* ===== MOBILE VIDEO SAFE + FRAMING FIX (replace previous mobile block) ===== */
-:root { --safe-top: env(safe-area-inset-top, 12px); }
-
-html, body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  -webkit-text-size-adjust: 100%;
-}
-
-.app-shell {
-  padding-top: calc(var(--safe-top) + 8px) !important;
-  max-width: 100% !important;
-}
-
-/* CORE: show whole face better by using contain + centered position,
-   and allow taller video space so face isn't cut */
-video {
-  object-fit: contain !important;
-  object-position: center center !important; /* center the frame */
-  width: 100% !important;
-  max-height: 60vh !important;   /* allow more vertical room for face */
-  background: #020617 !important;
-  display: block;
-  border-radius: 12px;
-}
-
-/* smaller phones: allow slightly shorter but keep center */
-@media (max-width: 420px) {
-  video {
-    max-height: 56vh !important;
-    object-position: center center !important;
-  }
-  #controls button { min-width: 120px !important; }
-  .main-layout { grid-template-columns: 1fr !important; }
-}
-
-/* If you still see top crop, uncomment the next rule to nudge video down:
+/* If remote stream is vertical, add class "portrait" on that video element
+   to show full portrait (letterbox) instead of forced crop:
+   .video-card video.portrait { object-fit: contain !important; }
 */
-video { transform: translateY(6%) !important; }
+.video-card video.portrait{object-fit:contain !important;object-position:center center !important;}
 
+/* chat area stretch */
+#chat-area{display:flex;flex-direction:column;}
+#chat-messages{flex:1 1 auto;overflow:auto;}
+/* ===== End unified video+controls CSS ===== */
 
 
   </style>
