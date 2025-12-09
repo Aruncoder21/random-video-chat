@@ -666,6 +666,47 @@ html, body {
   /* reduce big paddings that cause shrink */
   .brand, .app-header { gap: 8px !important; }
 }
+/* ===== mobile video framing fixes ===== */
+/* paste this at the END of your <style> (before </style>) */
+
+:root {
+  /* make sure safe-area env works on iOS/Android */
+  --safe-top: env(safe-area-inset-top, 12px);
+}
+
+/* give page a little extra top padding for notches */
+body, .app-shell {
+  padding-top: calc(var(--safe-top) + 8px) !important;
+}
+
+/* ensure videos show whole frame instead of cropping */
+video {
+  object-fit: contain !important;   /* show full frame (no crop) */
+  width: 100% !important;
+  max-height: 42vh !important;      /* limit height so header + controls remain visible */
+  background: #020617 !important;
+}
+
+/* for very tall phones, allow slightly taller local preview */
+@media (max-width:420px) {
+  video {
+    max-height: 48vh !important;
+  }
+}
+
+/* if you prefer less black bars and accept slight crop, switch to cover by uncommenting:
+video { object-fit: cover !important; }
+*/
+
+/* small tweak: center video content vertically inside its container */
+.video-wrapper, .video-row {
+  align-items: center !important;
+}
+
+/* if top of video still touches status bar, add small margin */
+.video-wrapper > video {
+  margin-top: 6px !important;
+}
 
   </style>
 </head>
