@@ -468,7 +468,7 @@ button:disabled::before {
 
 
 /* ===== Unified video + controls responsive fixes =====
-   Paste this ONCE inside <style> before </style> */
+
 
 /* safe-area & base */
 :root { --safe-top: env(safe-area-inset-top, 10px); }
@@ -480,7 +480,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;-webkit-text-size-adjust:100
 .video-row,.video-wrapper{display:flex;gap:18px;align-items:stretch;justify-content:space-between;}
 .video-card{flex:1 1 0;display:flex;flex-direction:column;gap:12px;min-width:0;}
 
-/* unified video element (16:9 boxes) */
+/* unified video element */
 .video-card video{
   width:100% !important;
   height:auto !important;
@@ -522,8 +522,7 @@ html,body{width:100%;height:100%;margin:0;padding:0;-webkit-text-size-adjust:100
 }
 
 /* If remote stream is vertical, add class "portrait" on that video element
-   to show full portrait (letterbox) instead of forced crop:
-   .video-card video.portrait { object-fit: contain !important; }
+
 */
 .video-card video.portrait{object-fit:contain !important;object-position:center center !important;}
 
