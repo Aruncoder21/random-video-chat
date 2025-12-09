@@ -3,192 +3,671 @@
 <head>
   <meta charset="UTF-8" />
   <title>Random Video Chat</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    * {
+      box-sizing: border-box;
       margin: 0;
       padding: 0;
-      background: #020617;
-      color: #e5e7eb;
-      font-family: Arial, sans-serif;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-      box-sizing: border-box;
     }
 
-    h1 {
-      margin-bottom: 6px;
+    body {
+      min-height: 100vh;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #1d4ed8 0, #020617 45%, #000 100%);
+      color: #e5e7eb;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .app-shell {
+      width: 100%;
+      max-width: 1100px;
+      background: rgba(15, 23, 42, 0.92);
+      border-radius: 22px;
+      box-shadow:
+        0 18px 40px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(148, 163, 184, 0.08);
+      padding: 18px 18px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(148, 163, 184, 0.25);
+    }
+
+    .app-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .brand-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 12px;
+      background: conic-gradient(from 140deg, #22c55e, #3b82f6, #a855f7, #22c55e);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #0b1120;
+      font-weight: 800;
+      font-size: 18px;
+      box-shadow: 0 0 0 2px #020617;
+    }
+
+    .brand-text-main {
+      font-size: 18px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .brand-text-sub {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .status-pill {
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 118, 110, 0.18);
+      border: 1px solid rgba(45, 212, 191, 0.4);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: #a5f3fc;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
     }
 
     #status {
-      font-size: 14px;
-      margin-bottom: 12px;
+      font-size: 13px;
+      color: #9ca3af;
+      margin-top: 4px;
+    }
+
+    .main-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.6fr) minmax(0, 1.1fr);
+      gap: 14px;
+    }
+
+    /* Video card */
+
+    .video-card {
+      background: linear-gradient(145deg, #020617, #020617);
+      border-radius: 18px;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      border: 1px solid rgba(30, 64, 175, 0.6);
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.9);
+    }
+
+    .video-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .video-wrapper {
+      flex: 1 1 230px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .video-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
       color: #9ca3af;
     }
 
-    #video-container {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-bottom: 16px;
+    .video-label span {
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      margin-left: 6px;
+      background: rgba(34, 197, 94, 0.12);
+      color: #bbf7d0;
+    }
+
+    .video-label--stranger span {
+      background: rgba(59, 130, 246, 0.12);
+      color: #bfdbfe;
     }
 
     video {
-      width: 320px;
-      max-width: 45vw;
-      background: #000;
-      border-radius: 10px;
-    }
-
-    #controls {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-    }
-
-    button {
-      padding: 8px 14px;
-      border-radius: 6px;
-      border: none;
-      cursor: pointer;
-      font-weight: 600;
-    }
-
-    #start-btn {
-      background: #22c55e;
-      color: #022c22;
-    }
-
-    #next-btn {
-      background: #a855f7;
-      color: #18022c;
-    }
-
-    #mute-btn, #cam-btn {
-      background: #38bdf8;
-      color: #02131f;
-    }
-
-    #end-btn {
-      background: #ef4444;
-      color: #140404;
-    }
-
-    /* Chat area */
-
-    #chat-area {
       width: 100%;
-      max-width: 700px;
-      border: 1px solid #1f2937;
-      border-radius: 10px;
+      aspect-ratio: 16 / 9;
       background: #020617;
-      display: flex;
-      flex-direction: column;
-      height: 220px;
-      overflow: hidden;
+      border-radius: 14px;
+      object-fit: cover;
+      border: 1px solid rgba(15, 23, 42, 0.9);
+      box-shadow:
+        inset 0 0 0 1px rgba(148, 163, 184, 0.12),
+        0 10px 24px rgba(15, 23, 42, 0.85);
     }
 
-    #chat-messages {
-      flex: 1;
-      padding: 8px;
-      overflow-y: auto;
-      font-size: 14px;
-    }
+    /* Controls */
 
-    .chat-msg {
-      margin: 4px 0;
-      padding: 4px 8px;
-      border-radius: 6px;
-      max-width: 80%;
-      word-wrap: break-word;
-    }
+    /* ===== BUTTONS (for all controls) ===== */
 
-    .me-msg {
-      background: #2563eb;
-      margin-left: auto;
-      text-align: right;
-    }
+/* Base style – Uiverse inspired */
+button {
+  /* accent color har button ke liye alag set hoga niche IDs me */
+  --accent: #1BFD9C;
 
-    .stranger-msg {
-      background: #374151;
-      margin-right: auto;
-      text-align: left;
-    }
+  font-size: 14px;
+  padding: 0.65em 2.1em;
+  letter-spacing: 0.04em;
+  position: relative;
+  font-family: inherit;
+  border-radius: 0.7em;
+  overflow: hidden;
+  line-height: 1.3em;
 
-    .system-msg {
-      text-align: center;
-      color: #9ca3af;
-      font-size: 12px;
-    }
+  border: 2px solid var(--accent);
+  background: linear-gradient(
+    to right,
+    rgba(27, 253, 156, 0.06) 1%,
+    transparent 40%,
+    transparent 60%,
+    rgba(27, 253, 156, 0.06) 100%
+  );
+  color: var(--accent);
 
-    #chat-input-row {
-      display: flex;
-      border-top: 1px solid #1f2937;
-    }
+  box-shadow:
+    inset 0 0 10px rgba(27, 253, 156, 0.18),
+    0 0 12px 3px rgba(27, 253, 156, 0.04);
 
-    #chat-input {
-      flex: 1;
-      border: none;
-      padding: 8px;
-      background: #020617;
-      color: #e5e7eb;
-      outline: none;
-      font-size: 14px;
-    }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
 
-    #chat-send-btn {
-      border: none;
-      padding: 0 14px;
-      background: #22c55e;
-      color: #022c22;
-      font-weight: 600;
-      cursor: pointer;
-    }
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(.2,.9,.2,1);
+}
 
-    #chat-send-btn:disabled,
-    #chat-input:disabled {
-      opacity: 0.5;
-      cursor: default;
+/* Shimmer strip */
+button::before {
+  content: "";
+  position: absolute;
+  left: -4.5em;
+  width: 4em;
+  height: 100%;
+  top: 0;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(27, 253, 156, 0.08) 40%,
+    rgba(27, 253, 156, 0.08) 60%,
+    transparent 100%
+  );
+  transition: transform .4s ease-in-out;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+
+button:hover:not(:disabled) {
+  color: #ecfeff;
+  box-shadow:
+    inset 0 0 12px rgba(27, 253, 156, 0.26),
+    0 0 18px 6px rgba(27, 253, 156, 0.09);
+  transform: translateY(-2px);
+}
+
+button:hover:not(:disabled)::before {
+  transform: translateX(15em);
+}
+
+/* Disabled */
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+  color: rgba(226, 232, 240, 0.7);
+  border-color: rgba(148, 163, 184, 0.35);
+  background: rgba(15, 23, 42, 0.4);
+}
+
+button:disabled::before {
+  display: none;
+}
+
+/* ===== Individual buttons (colors tuned for dark/neon theme) ===== */
+
+/* Start – neon green */
+#start-btn {
+  --accent: #22c55e;
+}
+
+/* Next – purple */
+#next-btn {
+  --accent: #a855f7;
+}
+
+/* Mute / Camera – cyan/blue */
+#mute-btn,
+#cam-btn {
+  --accent: #38bdf8;
+}
+
+/* End – red */
+#end-btn {
+  --accent: #ef4444;
+  border-color: rgba(239, 68, 68, 0.9);
+  box-shadow:
+    inset 0 0 10px rgba(239, 68, 68, 0.18),
+    0 0 12px 3px rgba(239, 68, 68, 0.08);
+}
+
+/* Small responsive tweak */
+#controls {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+@media (max-width: 480px) {
+  button {
+    padding: 0.55em 1.4em;
+    font-size: 13px;
+  }
+}
+
+
+    /* Chat */
+
+    /* ===== Chat UI (Uiverse-inspired, adapted) ===== */
+.chat-card {
+  background: linear-gradient(145deg, rgba(3,7,18,0.9), rgba(2,6,23,0.95));
+  border-radius: 14px;
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  border: 1px solid rgba(59,130,246,0.08);
+  box-shadow: 0 8px 28px rgba(2,6,23,0.8);
+  min-height: 320px;
+}
+
+/* header */
+.chat-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(100,116,139,0.06);
+}
+.chat-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #e6eef9;
+}
+.chat-sub {
+  font-size: 11px;
+  color: #9aa6bb;
+}
+
+/* chat box */
+#chat-area {
+  width: 100%;
+  border-radius: 10px;
+  background: linear-gradient(180deg, rgba(6,10,22,0.4), rgba(4,7,18,0.6));
+  display: flex;
+  flex-direction: column;
+  height: 260px;
+  overflow: hidden;
+  border: 1px solid rgba(30,64,175,0.06);
+}
+
+/* messages scroll area */
+#chat-messages {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  scrollbar-width: thin;
+}
+
+/* single message */
+.chat-msg {
+  display: inline-block;
+  max-width: 78%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.25;
+  word-wrap: break-word;
+}
+
+/* my messages (right) */
+.me-msg {
+  background: linear-gradient(135deg,#2563eb,#1e40af);
+  color: #f8fbff;
+  margin-left: auto;
+  box-shadow: 0 6px 14px rgba(30,64,175,0.24);
+  border: 1px solid rgba(59,130,246,0.12);
+}
+
+/* stranger messages (left) */
+.stranger-msg {
+  background: rgba(15,23,42,0.8);
+  color: #e6eef9;
+  margin-right: auto;
+  border: 1px solid rgba(148,163,184,0.06);
+}
+
+/* system text (centered small) */
+.system-msg {
+  text-align: center;
+  color: #94a3b8;
+  font-size: 12px;
+  margin: 6px 0;
+}
+
+/* input row */
+#chat-input-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-top: 1px solid rgba(30,64,175,0.06);
+  padding-top: 8px;
+  background: linear-gradient(180deg, rgba(3,7,18,0.45), rgba(6,10,22,0.55));
+  border-radius: 0 0 10px 10px;
+}
+
+/* text input */
+#chat-input {
+  flex: 1;
+  height: 44px;
+  border: none;
+  padding: 10px 12px;
+  background: rgba(255,255,255,0.03);
+  color: #e6eef9;
+  border-radius: 10px;
+  outline: none;
+  font-size: 14px;
+}
+
+/* placeholder color */
+#chat-input::placeholder {
+  color: #7b8794;
+}
+
+/* send button (icon circle) */
+#chat-send-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  border: 1px solid rgba(34,197,94,0.12);
+  background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.06));
+  color: #bbf7d0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+#chat-send-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(34,197,94,0.12);
+}
+
+/* disabled states */
+#chat-send-btn:disabled,
+#chat-input:disabled {
+  opacity: 0.48;
+  cursor: default;
+}
+
+/* message timestamp small (optional) */
+.msg-time {
+  display: block;
+  font-size: 11px;
+  color: #8694a6;
+  margin-bottom: 4px;
+}
+
+/* responsive */
+@media (max-width: 900px) {
+  #chat-area { height: 220px; }
+}
+
+
+    /* next */
+
+    @media (max-width: 640px) {
+      .app-shell {
+        padding: 14px 10px 10px;
+        border-radius: 16px;
+      }
+
+      video {
+        border-radius: 10px;
+      }
+
+      #controls {
+        justify-content: flex-start;
+        overflow-x: auto;
+      }
+
+      button {
+        font-size: 12px;
+        padding-inline: 12px;
+      }
+      /* ===== Mobile / small screens responsive tweaks ===== */
+
+/* Base adjustments for small viewports */
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr; /* stack left (video) and right (chat) */
+    gap: 12px;
+  }
+
+  .app-shell {
+    padding: 12px;
+    border-radius: 12px;
+  }
+
+  .video-card {
+    padding: 12px;
+    border-radius: 14px;
+  }
+
+  .chat-card {
+    padding: 10px;
+    border-radius: 14px;
+  }
+
+  /* make videos taller and full width inside stacked layout */
+  .video-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .video-wrapper {
+    width: 100%;
+  }
+
+  video {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+  }
+
+  /* move controls under videos and center */
+  #controls {
+    justify-content: center;
+    gap: 8px;
+  }
+
+  /* buttons become pill full/half width for easy tapping */
+  #controls button {
+    flex: 1 1 calc(50% - 8px);
+    min-width: 120px;
+    padding: 0.7em 0.8em;
+    font-size: 14px;
+  }
+
+  /* for very small screens make each control full width stacked */
+  @media (max-width: 420px) {
+    #controls button { flex: 1 1 100%; min-width: 0; }
+  }
+
+  /* Chat: make messages area shorter but still scrollable */
+  #chat-area { height: 220px; }
+  #chat-messages { padding: 8px; gap: 6px; }
+
+  /* Chat input larger to tap easily */
+  #chat-input {
+    height: 46px;
+    padding: 12px;
+    font-size: 15px;
+  }
+  #chat-send-btn {
+    width: 46px;
+    height: 46px;
+  }
+
+  /* Header tweaks */
+  .brand-text-main { font-size: 16px; }
+  .brand-text-sub { font-size: 11px; }
+
+  /* status pill smaller */
+  .status-pill { font-size: 11px; padding: 5px 8px; }
+
+  /* Reduce shadows a bit for mobile performance */
+  .app-shell, .video-card, .chat-card { box-shadow: 0 8px 20px rgba(0,0,0,0.55); }
+
+  /* Hide some decorative elements on very small screens to save space */
+  @media (max-width: 360px) {
+    .brand-text-sub { display: none; }
+    .status-pill { display: none; }
+    .video-label span { display: none; }
+    .video-label { font-size: 10px; }
+  }
+}
+
+/* Extra: improve touch-targets on all devices */
+button, #chat-send-btn, #chat-input {
+  -webkit-tap-highlight-color: rgba(255,255,255,0.05);
+  touch-action: manipulation;
+}
+
+/* Optional: hide remote video border on tiny screens so chat looks clean */
+@media (max-width: 420px) {
+  .video-card { border-radius: 12px; }
+  video { border: 0.5px solid rgba(255,255,255,0.03); }
+}
+
+/* Smooth scroll behaviour for chat on mobile */
+#chat-messages {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
     }
   </style>
 </head>
 <body>
-  <h1>Random Video Chat</h1>
-  <div id="status">Click "Start" to find a stranger</div>
+  <div class="app-shell">
+    <!-- header -->
+    <div class="app-header">
+      <div class="brand">
+        <div class="brand-logo">R</div>
+        <div>
+          <div class="brand-text-main">Random Video Chat</div>
+          <div class="brand-text-sub">Anonymous 1-to-1 video & text</div>
+        </div>
+      </div>
 
-  <div id="video-container">
-    <div>
-      <div>YOU</div>
-      <video id="localVideo" autoplay playsinline muted></video>
+      <div>
+        <div class="status-pill">
+          <span class="status-dot"></span>
+          Live session
+        </div>
+        <div id="status">Click “Start” to find a stranger</div>
+      </div>
     </div>
-    <div>
-      <div>STRANGER</div>
-      <video id="remoteVideo" autoplay playsinline></video>
+
+    <div class="main-layout">
+      <!-- LEFT: Video + controls -->
+      <div class="video-card">
+        <div class="video-row">
+          <div class="video-wrapper">
+            <div class="video-label">
+              YOU <span>Local</span>
+            </div>
+            <video id="localVideo" autoplay playsinline muted></video>
+          </div>
+
+          <div class="video-wrapper">
+            <div class="video-label video-label--stranger">
+              STRANGER <span>Remote</span>
+            </div>
+            <video id="remoteVideo" autoplay playsinline></video>
+          </div>
+        </div>
+
+        <div id="controls">
+          <button id="start-btn">Start</button>
+          <button id="next-btn" disabled>Next</button>
+          <button id="mute-btn" disabled>Mute</button>
+          <button id="cam-btn" disabled>Camera Off</button>
+          <button id="end-btn" disabled>End</button>
+        </div>
+      </div>
+
+      <!-- RIGHT: Chat -->
+      <div class="chat-card">
+        <div class="chat-header">
+          <div class="chat-title">Text chat</div>
+          <div style="font-size:11px;color:#6b7280;">Conversations auto-clear on next / end</div>
+        </div>
+
+        <div id="chat-area">
+          <div id="chat-messages"></div>
+          <div id="chat-input-row">
+            <input id="chat-input" type="text" placeholder="Type a message..." disabled />
+            <button id="chat-send-btn" disabled>Send</button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <div id="controls">
-    <button id="start-btn">Start</button>
-    <button id="next-btn" disabled>Next</button>
-    <button id="mute-btn" disabled>Mute</button>
-    <button id="cam-btn" disabled>Camera Off</button>
-    <button id="end-btn" disabled>End</button>
-  </div>
-
-  <!-- Text chat area -->
-  <div id="chat-area">
-    <div id="chat-messages"></div>
-    <div id="chat-input-row">
-      <input id="chat-input" type="text" placeholder="Type a message..." disabled />
-      <button id="chat-send-btn" disabled>Send</button>
-    </div>
-  </div>
-
+  <!-- JS (logic same as pehle) -->
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
@@ -203,7 +682,6 @@
     const localVideo = document.getElementById("localVideo");
     const remoteVideo = document.getElementById("remoteVideo");
 
-    // chat elements
     const chatMessages = document.getElementById("chat-messages");
     const chatInput = document.getElementById("chat-input");
     const chatSendBtn = document.getElementById("chat-send-btn");
@@ -292,7 +770,6 @@
       });
     }
 
-    // partner mil gaya
     socket.on("partner-found", async (data) => {
       setStatus("Partner found. Connecting...");
       isInitiator = data.initiator;
@@ -360,12 +837,9 @@
       }
     });
 
-    // TEXT CHAT receive
     socket.on("chat-message", (data) => {
       addChatMessage(data.from, data.text);
     });
-
-    // -------------- BUTTON HANDLERS -----------------
 
     startBtn.onclick = async () => {
       await setupMedia();
@@ -416,7 +890,6 @@
       addSystemMessage("Call ended.");
     };
 
-    // send chat message
     function sendChat() {
       const text = chatInput.value.trim();
       if (!text) return;
@@ -456,3 +929,6 @@
   </script>
 </body>
 </html>
+
+
+
