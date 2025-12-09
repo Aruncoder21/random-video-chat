@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <title>Random Video Chat</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 
   <!-- Google Font -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -598,8 +600,76 @@ button, #chat-send-btn, #chat-input {
 }
 
     }
+    /* === FORCE mobile-friendly overrides (drop-in) === */
+/* paste this at the end of your <style> in public/index.html */
+
+html, body {
+  width: 100% !important;
+  height: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  -webkit-text-size-adjust: 100% !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  max-width: 100% !important;     /* force full width */
+  margin: 12px auto !important;
+  padding: 12px !important;
+  border-radius: 12px !important;
+}
+
+/* make sure internal grid becomes single column on small screens */
+@media (max-width: 900px) {
+  .main-layout {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+
+  .video-card, .chat-card {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .video-row {
+    flex-direction: column !important;
+    gap: 12px !important;
+  }
+
+  .video-wrapper {
+    width: 100% !important;
+  }
+
+  video {
+    width: 100% !important;
+    height: auto !important;
+    aspect-ratio: 16/9;
+  }
+
+  #controls {
+    justify-content: center !important;
+    gap: 10px !important;
+  }
+
+  /* make buttons larger and wrapped for easy tap */
+  #controls button {
+    flex: 1 1 calc(50% - 8px) !important;
+    min-width: 120px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* chat area full width */
+  #chat-area {
+    width: 100% !important;
+  }
+
+  /* reduce big paddings that cause shrink */
+  .brand, .app-header { gap: 8px !important; }
+}
+
   </style>
 </head>
+
 <body>
   <div class="app-shell">
     <!-- header -->
