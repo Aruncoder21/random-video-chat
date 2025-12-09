@@ -667,6 +667,48 @@ html, body {
   .brand, .app-header { gap: 8px !important; }
 }
 
+/* ===== MOBILE VIDEO SAFE + FRAMING FIX (replace previous mobile block) ===== */
+:root { --safe-top: env(safe-area-inset-top, 12px); }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+}
+
+.app-shell {
+  padding-top: calc(var(--safe-top) + 8px) !important;
+  max-width: 100% !important;
+}
+
+/* CORE: show whole face better by using contain + centered position,
+   and allow taller video space so face isn't cut */
+video {
+  object-fit: contain !important;
+  object-position: center center !important; /* center the frame */
+  width: 100% !important;
+  max-height: 60vh !important;   /* allow more vertical room for face */
+  background: #020617 !important;
+  display: block;
+  border-radius: 12px;
+}
+
+/* smaller phones: allow slightly shorter but keep center */
+@media (max-width: 420px) {
+  video {
+    max-height: 56vh !important;
+    object-position: center center !important;
+  }
+  #controls button { min-width: 120px !important; }
+  .main-layout { grid-template-columns: 1fr !important; }
+}
+
+/* If you still see top crop, uncomment the next rule to nudge video down:
+.video { transform: translateY(6%) !important; }
+*/
+
 
   </style>
 </head>
