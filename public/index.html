@@ -466,64 +466,80 @@ button:disabled::before {
   #chat-area { height: 220px; }
 }
 
-:root { --safe-top: env(safe-area-inset-top, 10px); }
-html,body{width:100%;height:100%;margin:0;padding:0;-webkit-text-size-adjust:100%;}
-.app-shell{max-width:100% !important;padding-top:calc(var(--safe-top) + 10px) !important;}
+:root { 
+  /* Yaha maine fallback value ko 10px se badha kar 25px kiya hai 
+     taaki agar mobile safe area detect na kare toh bhi upar jagah rahe */
+  --safe-top: env(safe-area-inset-top, 25px); 
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  -webkit-text-size-adjust: 100%;
+  /* Mobile me scroll bounce rokne ke liye ye add kar sakte ho agar zarurat ho */
+  overscroll-behavior-y: none; 
+}
+
+.app-shell {
+  max-width: 100% !important;
+  /* Padding calculation ko thoda badhaya hai (safe-top + 20px) 
+     taaki content bilkul upar chipak na jaye */
+  padding-top: calc(var(--safe-top) + 20px) !important;
+}
 
 /* layout containers */
-.main-layout{display:grid;grid-template-columns:1fr 36%;gap:18px;}
-.video-row,.video-wrapper{display:flex;gap:18px;align-items:stretch;justify-content:space-between;}
-.video-card{flex:1 1 0;display:flex;flex-direction:column;gap:12px;min-width:0;}
+.main-layout { display: grid; grid-template-columns: 1fr 36%; gap: 18px; }
+.video-row, .video-wrapper { display: flex; gap: 18px; align-items: stretch; justify-content: space-between; }
+.video-card { flex: 1 1 0; display: flex; flex-direction: column; gap: 12px; min-width: 0; }
 
 /* unified video element */
-.video-card video{
-  width:100% !important;
-  height:auto !important;
-  aspect-ratio:16/9;
-  object-fit:cover !important;
-  object-position:center center !important;
-  border-radius:12px;
-  display:block;
-  background:#020617;
-  box-shadow:inset 0 0 0 1px rgba(255,255,255,0.02);
+.video-card video {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16/9;
+  object-fit: cover !important;
+  object-position: center center !important;
+  border-radius: 12px;
+  display: block;
+  background: #020617;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
 }
 
 /* label above video */
-.video-label{font-size:12px;letter-spacing:0.08em;color:#9aa6bb;}
+.video-label { font-size: 12px; letter-spacing: 0.08em; color: #9aa6bb; }
 
 /* controls below videos: always centered and wrapped */
-#controls{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;align-items:center;padding:8px 6px 12px;margin-top:6px;}
-#controls button{min-width:120px;padding:0.6rem 1.2rem;font-size:14px;border-radius:10px;}
-#end-btn{margin-left:6px;}
+#controls { display: flex; gap: 12px; flex-wrap: wrap; justify-content: center; align-items: center; padding: 8px 6px 12px; margin-top: 6px; }
+#controls button { min-width: 120px; padding: 0.6rem 1.2rem; font-size: 14px; border-radius: 10px; }
+#end-btn { margin-left: 6px; }
 
 /* chat column */
-.chat-card{flex:0 0 36%;min-width:300px;}
+.chat-card { flex: 0 0 36%; min-width: 300px; }
 
 /* responsive: stack on small screens */
-@media (max-width:900px){
-  .main-layout{grid-template-columns:1fr;}
-  .chat-card{width:100%;min-width:0;}
-  .video-row,.video-wrapper{flex-direction:column;gap:12px;}
-  .video-card video{aspect-ratio:16/9;max-height:52vh;}
-  #controls{gap:10px;padding-bottom:8px;}
-  #controls button{min-width:46%;flex:1 1 46%;}
-  .app-shell,.video-card,.chat-card{padding-left:12px !important;padding-right:12px !important;}
+@media (max-width: 900px) {
+  .main-layout { grid-template-columns: 1fr; }
+  .chat-card { width: 100%; min-width: 0; }
+  .video-row, .video-wrapper { flex-direction: column; gap: 12px; }
+  .video-card video { aspect-ratio: 16/9; max-height: 52vh; }
+  #controls { gap: 10px; padding-bottom: 8px; }
+  #controls button { min-width: 46%; flex: 1 1 46%; }
+  .app-shell, .video-card, .chat-card { padding-left: 12px !important; padding-right: 12px !important; }
 }
 
 /* very small phones */
-@media (max-width:420px){
-  #controls button{min-width:100%;flex:1 1 100%;}
-  .video-card video{max-height:48vh;}
+@media (max-width: 420px) {
+  #controls button { min-width: 100%; flex: 1 1 100%; }
+  .video-card video { max-height: 48vh; }
 }
 
-/* If remote stream is vertical, add class "portrait" on that video element
+/* If remote stream is vertical, add class "portrait" on that video element */
+.video-card video.portrait { object-fit: contain !important; object-position: center center !important; }
 
-*/
-.video-card video.portrait{object-fit:contain !important;object-position:center center !important;}
-
-#chat-area{display:flex;flex-direction:column;}
-#chat-messages{flex:1 1 auto;overflow:auto;}
-
+#chat-area { display: flex; flex-direction: column; }
+#chat-messages { flex: 1 1 auto; overflow: auto; }
 
   </style>
 </head>
